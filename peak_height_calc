@@ -1,0 +1,90 @@
+import pygtk
+pygtk.require('2.0')
+
+### Calculate the height of maximum to minimum between two selected points ### 
+
+### Using the screen reader choose two points from both sides of a peak - one before and one after.
+### Then run the script to find the maximum and minimum point of the peak and calculate the height.
+
+### Draw a vertical line at x ranging from the maximum to the minimum of the data
+
+### SET THE UNIT OF Y
+unit = "r.u."
+
+
+def drawvline(x, cl = None):
+	if cl is None: 
+		cl = "red"
+	arrow = ArrowMarker()
+	arrow.setStart(x, c.minYValue())
+	arrow.setEnd(x, c.maxYValue())
+	arrow.setStyle(QtCore.Qt.DashLine)
+	arrow.setColor(QtGui.QColor(cl))
+	arrow.setWidth(1)
+	arrow.drawStartArrow(False)
+	arrow.drawEndArrow(False)
+	arrow1 = l.addArrow(arrow)
+
+### Draw a horizontal line at y ranging from x-d to x+d
+def drawhline(y, x , d = 5.0, cl = None ):
+	if cl is None:
+		cl = "red"
+	arrow = ArrowMarker()
+	arrow.setStart(x - d, y)
+	arrow.setEnd(x + d, y)
+	arrow.setStyle(QtCore.Qt.DashLine)
+	arrow.setColor(QtGui.QColor(cl))
+	arrow.setWidth(1)
+	arrow.drawStartArrow(False)
+	arrow.drawEndArrow(False)
+	arrow1 = l.addArrow(arrow)
+
+### Start of script
+# get the graph and table
+
+g = currentGraph()
+l = g.activeLayer()
+c = l.curve(0)
+d = l.dataCurve(0)
+t = d.table()
+
+### Read from info the x and dx
+# add check and return error
+info = str(infoLineEdit().text())
+xvalue = info[info.find("x=")+2:info.find("; y")]
+dxvalue =  info[info.find("dx=")+3:info.find("; dy")]
+xmax = float(xvalue)
+xmin = xmax - float(dxvalue)
+
+### Find ixmax, ixmin
+x = t.colData(1)
+
+if xmax in x:
+	ixmax = x.index(xmax)
+else:
+	for i in range(0 , len(x)):
+		if x[i] > xmax:
+			ixmax = i
+			break
+
+if xmin in x:
+	ixmin = x.index(xmin)
+else:
+	for k in range(0, len(x)):
+		if x[k] > xmin:
+			ixmin = k
+			break
+
+### Locate maximum and minimum row number
+y = t.colData(2)[ixmin:ixmax]
+
+imax = y.index(max(y))+1
+imin = y.index(min(y))+1
+drawhline(max(y) , t.cell(1,imax+ixmin) , (max(x)-min(x))/100.0 , "blue")
+drawhline(min(y), t.cell(1,imin+ixmin), (max(x)-min(x))/100.0 , "blue")
+
+### Calculate height
+Ht =  "%.2f" % (max(y) - min(y))
+
+dy = currentGraph().activeLayer().newLegend(Ht+" "+unit)
+dy.setOriginCoord( t.cell(1,imax+ixmin), max(y))
