@@ -6,12 +6,10 @@ pygtk.require('2.0')
 ### Using the screen reader choose two points from both sides of a peak - one before and one after.
 ### Then run the script to find the maximum and minimum point of the peak and calculate the height.
 
-### Draw a vertical line at x ranging from the maximum to the minimum of the data
-
 ### SET THE UNIT OF Y
 unit = "r.u."
 
-
+### Draw a vertical line at x ranging from the maximum to the minimum of the data
 def drawvline(x, cl = None):
 	if cl is None: 
 		cl = "red"
@@ -40,13 +38,13 @@ def drawhline(y, x , d = 5.0, cl = None ):
 	arrow1 = l.addArrow(arrow)
 
 ### Start of script
-# get the graph and table
-
+## get the graph and table
 g = currentGraph()
 l = g.activeLayer()
 c = l.curve(0)
 d = l.dataCurve(0)
 t = d.table()
+x = t.colData(1)
 
 ### Read from info x and dx
 info = str(infoLineEdit().text())
@@ -60,8 +58,6 @@ except:
 else: 
 	if xmax <> xmin:	
 		### Find ixmax, ixmin
-		x = t.colData(1)
-		
 		if xmax in x:
 			ixmax = x.index(xmax)
 		else:
