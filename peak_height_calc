@@ -48,43 +48,48 @@ c = l.curve(0)
 d = l.dataCurve(0)
 t = d.table()
 
-### Read from info the x and dx
-# add check and return error
+### Read from info x and dx
 info = str(infoLineEdit().text())
 xvalue = info[info.find("x=")+2:info.find("; y")]
 dxvalue =  info[info.find("dx=")+3:info.find("; dy")]
-xmax = float(xvalue)
-xmin = xmax - float(dxvalue)
-
-### Find ixmax, ixmin
-x = t.colData(1)
-
-if xmax in x:
-	ixmax = x.index(xmax)
-else:
-	for i in range(0 , len(x)):
-		if x[i] > xmax:
-			ixmax = i
-			break
-
-if xmin in x:
-	ixmin = x.index(xmin)
-else:
-	for k in range(0, len(x)):
-		if x[k] > xmin:
-			ixmin = k
-			break
-
-### Locate maximum and minimum row number
-y = t.colData(2)[ixmin:ixmax]
-
-imax = y.index(max(y))+1
-imin = y.index(min(y))+1
-drawhline(max(y) , t.cell(1,imax+ixmin) , (max(x)-min(x))/100.0 , "blue")
-drawhline(min(y), t.cell(1,imin+ixmin), (max(x)-min(x))/100.0 , "blue")
-
-### Calculate height
-Ht =  "%.2f" % (max(y) - min(y))
-
-dy = currentGraph().activeLayer().newLegend(Ht+" "+unit)
-dy.setOriginCoord( t.cell(1,imax+ixmin), max(y))
+try:
+	xmax = float(xvalue)
+	xmin = xmax - float(dxvalue)
+except:
+	displayInfo("Choose two points with screen reader")
+else: 
+	if xmax <> xmin:	
+		### Find ixmax, ixmin
+		x = t.colData(1)
+		
+		if xmax in x:
+			ixmax = x.index(xmax)
+		else:
+			for i in range(0 , len(x)):
+				if x[i] > xmax:
+					ixmax = i
+					break
+		
+		if xmin in x:
+			ixmin = x.index(xmin)
+		else:
+			for k in range(0, len(x)):
+				if x[k] > xmin:
+					ixmin = k
+					break
+		
+		### Locate maximum and minimum row number
+		y = t.colData(2)[ixmin:ixmax]
+			
+		imax = y.index(max(y))+1
+		imin = y.index(min(y))+1
+		drawhline(max(y) , t.cell(1,imax+ixmin) , (max(x)-min(x))/100.0 , "blue")
+		drawhline(min(y), t.cell(1,imin+ixmin), (max(x)-min(x))/100.0 , "blue")
+		
+		### Calculate height
+		Ht =  "%.2f" % (max(y) - min(y))
+		
+		dy = currentGraph().activeLayer().newLegend(Ht+" "+unit)
+		dy.setOriginCoord( t.cell(1,imax+ixmin), max(y))
+	else:
+		displayInfo("Choose two points with screen reader")
